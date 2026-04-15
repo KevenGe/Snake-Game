@@ -128,3 +128,48 @@ class TestCollision:
         logic.direction = Direction.LEFT
         logic.tick()
         assert logic.game_over
+
+
+from snake_game.config import PowerupType
+from snake_game.powerup_system import PowerupSystem
+from snake_game.particle_system import ParticleSystem
+
+
+class TestPowerupIntegration:
+    def test_powerup_system_initialized(self):
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        assert hasattr(logic, "powerup_system")
+        assert isinstance(logic.powerup_system, PowerupSystem)
+
+    def test_particle_system_initialized(self):
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        assert hasattr(logic, "particle_system")
+        assert isinstance(logic.particle_system, ParticleSystem)
+
+    def test_eat_food_may_spawn_powerup(self):
+        logic = GameLogic(DifficultyLevel.TRAINING)  # 30% powerup chance
+        head = logic.snake[0]
+        logic.food = Position(head.x + 1, head.y)
+        logic.tick()
+        # Food was eaten; a powerup may have been placed on the board
+        # (non-deterministic, so we just check the mechanism runs)
+        assert isinstance(logic.powerups_on_board, list)
+
+    def test_eat_powerup_activates_it(self):
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        head = logic.snake[0]
+        powerup_pos = Position(head.x + 1, head.y)
+        logic.powerups_on_board = [(powerup_pos, PowerupType.OVERCLOCK)]
+        logic.food = Position(head.x + 2, head.y)
+        logic.tick()
+        # Powerup eaten, should be activated
+        assert logic.powerup_system.has_effect(PowerupType.OVERCLOCK)
+        assert len(logic.powerups_on_board) == 0
+
+    def test_invincibility_from_firewall(self):
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        head = logic.snake[0]
+        # Activate firewall
+        logic.powerup_system.activate(PowerupType.FIREWALL)
+        logic.invincible = logic.powerup_system.invincibility_active()
+        assert logic.invincible
