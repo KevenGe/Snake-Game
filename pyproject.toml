@@ -1,0 +1,18 @@
+[project]
+name = "snake-game"
+version = "0.1.0"
+description = "Cyberpunk neon-themed Snake game built with PyQt5"
+requires-python = ">=3.12"
+dependencies = [
+    "pyqt5>=5.15.0",
+]
+
+[project.scripts]
+snake-game = "snake_game.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
