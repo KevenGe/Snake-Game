@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from typing import Optional
+import os
+import sys
 from pathlib import Path
 
 from PyQt5.QtWidgets import (
@@ -21,6 +23,23 @@ from snake_game.config import (
 from snake_game.game_logic import GameLogic, Direction, Position
 from snake_game.leaderboard import Leaderboard
 from snake_game.sound_manager import SoundManager
+
+# Cross-platform font families (first available is used)
+_UI_FONT = "Segoe UI, Helvetica, Arial, sans-serif"
+_SYMBOL_FONT = "Segoe UI Symbol, Apple Symbols, Noto Sans Symbols, sans-serif"
+
+
+def _data_dir() -> Path:
+    """Return the platform-standard app data directory."""
+    if sys.platform == "win32":
+        base = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
+    elif sys.platform == "darwin":
+        base = Path.home() / "Library" / "Application Support"
+    else:
+        base = Path.home() / ".local" / "share"
+    d = base / "snake-game"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 
 # ── Game Canvas ──
@@ -101,7 +120,7 @@ class GameCanvas(QWidget):
                           CELL_SIZE * 0.6, CELL_SIZE * 0.6)
             # Icon
             p.setPen(QPen(color))
-            p.setFont(QFont("Segoe UI Symbol", int(CELL_SIZE * 0.6)))
+            p.setFont(QFont(_SYMBOL_FONT, int(CELL_SIZE * 0.6)))
             p.drawText(QRectF(px, py, CELL_SIZE, CELL_SIZE), Qt.AlignCenter,
                        icon_map.get(ptype, "?"))
 
@@ -142,13 +161,13 @@ class GameCanvas(QWidget):
             return
         p.fillRect(self.rect(), QColor(0, 0, 0, 150))
         p.setPen(QPen(QColor(COLORS["neon_magenta"])))
-        p.setFont(QFont("Segoe UI", 36, QFont.Bold))
+        p.setFont(QFont(_UI_FONT, 36, QFont.Bold))
         p.drawText(self.rect(), Qt.AlignCenter, "GAME OVER")
         # Draw restart hint below
         hint_rect = QRectF(self.rect())
         hint_rect.setTop(hint_rect.center().y() + 30)
         p.setPen(QPen(QColor(COLORS["neon_cyan"])))
-        p.setFont(QFont("Segoe UI", 14))
+        p.setFont(QFont(_UI_FONT, 14))
         p.drawText(hint_rect, Qt.AlignHCenter | Qt.AlignTop, "Press R to Restart")
 
 
@@ -192,7 +211,7 @@ class Sidebar(QFrame):
 
         # Score
         self.score_label = QLabel("Score: 0")
-        self.score_label.setFont(QFont("Segoe UI", 20, QFont.Bold))
+        self.score_label.setFont(QFont(_UI_FONT, 20, QFont.Bold))
         self.score_label.setStyleSheet(f"color: {COLORS['neon_cyan']};")
         layout.addWidget(self.score_label)
 
@@ -234,7 +253,7 @@ class Sidebar(QFrame):
 
         # Leaderboard
         self.leaderboard_label = QLabel("Leaderboard")
-        self.leaderboard_label.setFont(QFont("Segoe UI", 12, QFont.Bold))
+        self.leaderboard_label.setFont(QFont(_UI_FONT, 12, QFont.Bold))
         layout.addWidget(self.leaderboard_label)
         self.leaderboard_content = QLabel("No scores yet")
         self.leaderboard_content.setWordWrap(True)
@@ -273,7 +292,7 @@ class MainWindow(QMainWindow):
 
         self.difficulty = DifficultyLevel.NORMAL
         self.logic = GameLogic(self.difficulty)
-        self.leaderboard = Leaderboard(Path("leaderboard.json"))
+        self.leaderboard = Leaderboard(_data_dir() / "leaderboard.json")
         self.sound = SoundManager()
 
         self._build_ui()

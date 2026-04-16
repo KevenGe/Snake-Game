@@ -4,7 +4,8 @@ version = "0.1.0"
 description = "Cyberpunk neon-themed Snake game built with PyQt5"
 requires-python = ">=3.12"
 dependencies = [
-    "pyqt5>=5.15.0",
+    "pyqt5>=5.15.9,<5.15.12",
+    "pyqt5-qt5==5.15.2",
 ]
 
 [project.scripts]
