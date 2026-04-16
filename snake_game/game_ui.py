@@ -32,6 +32,7 @@ class GameCanvas(QWidget):
         super().__init__(parent)
         self.logic = logic
         self.setFixedSize(GRID_COLS * CELL_SIZE, GRID_ROWS * CELL_SIZE)
+        self.setFocusPolicy(Qt.StrongFocus)
 
     def paintEvent(self, event) -> None:  # noqa: N802
         painter = QPainter(self)
@@ -200,18 +201,22 @@ class Sidebar(QFrame):
 
         layout.addStretch()
 
-        # Virtual direction buttons
+        # Virtual direction buttons (NoFocus so keyboard stays on canvas)
         btn_layout = QVBoxLayout()
         self.btn_up = QPushButton("\u25b2")
+        self.btn_up.setFocusPolicy(Qt.NoFocus)
         self.btn_up.clicked.connect(lambda: self.direction_requested.emit(Direction.UP))
         btn_layout.addWidget(self.btn_up)
 
         mid_row = QHBoxLayout()
         self.btn_left = QPushButton("\u25c0")
+        self.btn_left.setFocusPolicy(Qt.NoFocus)
         self.btn_left.clicked.connect(lambda: self.direction_requested.emit(Direction.LEFT))
         self.btn_down = QPushButton("\u25bc")
+        self.btn_down.setFocusPolicy(Qt.NoFocus)
         self.btn_down.clicked.connect(lambda: self.direction_requested.emit(Direction.DOWN))
         self.btn_right = QPushButton("\u25b6")
+        self.btn_right.setFocusPolicy(Qt.NoFocus)
         self.btn_right.clicked.connect(lambda: self.direction_requested.emit(Direction.RIGHT))
         mid_row.addWidget(self.btn_left)
         mid_row.addWidget(self.btn_down)
@@ -267,6 +272,7 @@ class MainWindow(QMainWindow):
 
         self._build_ui()
         self._setup_timer()
+        self.canvas.setFocus()
 
     def _build_ui(self) -> None:
         central = QWidget()
