@@ -144,6 +144,12 @@ class GameCanvas(QWidget):
         p.setPen(QPen(QColor(COLORS["neon_magenta"])))
         p.setFont(QFont("Segoe UI", 36, QFont.Bold))
         p.drawText(self.rect(), Qt.AlignCenter, "GAME OVER")
+        # Draw restart hint below
+        hint_rect = QRectF(self.rect())
+        hint_rect.setTop(hint_rect.center().y() + 30)
+        p.setPen(QPen(QColor(COLORS["neon_cyan"])))
+        p.setFont(QFont("Segoe UI", 14))
+        p.drawText(hint_rect, Qt.AlignHCenter | Qt.AlignTop, "Press R to Restart")
 
 
 # ── Sidebar ──
@@ -319,6 +325,20 @@ class MainWindow(QMainWindow):
             if ok and name:
                 self.leaderboard.add_score(name, self.logic.score, self.difficulty.name)
                 self.sidebar.update_leaderboard(self.leaderboard.top_scores())
+
+        # Show game over dialog with restart option
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Game Over")
+        msg.setText(f"Score: {self.logic.score}")
+        msg.setStyleSheet(f"background: {COLORS['background']}; color: {COLORS['ui_text']};")
+        restart_btn = msg.addButton("Restart", QMessageBox.AcceptRole)
+        quit_btn = msg.addButton("Quit", QMessageBox.RejectRole)
+        msg.exec_()
+        clicked = msg.clickedButton()
+        if clicked == restart_btn:
+            self._restart()
+        elif clicked == quit_btn:
+            self.close()
 
     # ── Keyboard input ──
 
