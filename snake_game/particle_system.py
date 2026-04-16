@@ -23,7 +23,7 @@ class Particle:
 
     @property
     def alpha(self) -> float:
-        return max(0.0, self.life)
+        return max(0.0, min(1.0, self.life))
 
     def update(self) -> None:
         self.x += self.vx

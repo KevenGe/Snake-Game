@@ -173,3 +173,57 @@ class TestPowerupIntegration:
         logic.powerup_system.activate(PowerupType.FIREWALL)
         logic.invincible = logic.powerup_system.invincibility_active()
         assert logic.invincible
+
+
+class TestRestart:
+    def test_restart_creates_fresh_state(self):
+        """Verify that creating a new GameLogic resets all state."""
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        # Play until game over
+        for _ in range(GRID_COLS + 5):
+            if logic.game_over:
+                break
+            logic.tick()
+        assert logic.game_over
+
+        # "Restart" by creating a new instance
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        assert not logic.game_over
+        assert logic.score == 0
+        assert len(logic.snake) == 3
+        assert logic.direction == Direction.RIGHT
+        assert len(logic.powerup_system.active_powerups) == 0
+        assert len(logic.particle_system.particles) == 0
+
+    def test_restart_snake_moves_after_death(self):
+        """Verify snake can move normally after restart."""
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        # Die by hitting wall
+        for _ in range(GRID_COLS + 5):
+            if logic.game_over:
+                break
+            logic.tick()
+        assert logic.game_over
+
+        # Restart
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        # Verify snake can move
+        old_head = logic.snake[0]
+        logic.tick()
+        new_head = logic.snake[0]
+        assert new_head == Position(old_head.x + 1, old_head.y)
+
+    def test_tick_after_game_over_is_noop(self):
+        """Ticks after game_over should be ignored."""
+        logic = GameLogic(DifficultyLevel.NORMAL)
+        for _ in range(GRID_COLS + 5):
+            if logic.game_over:
+                break
+            logic.tick()
+        assert logic.game_over
+        score_before = logic.score
+        snake_len_before = len(logic.snake)
+        # Tick again — should be a no-op
+        logic.tick()
+        assert logic.score == score_before
+        assert len(logic.snake) == snake_len_before

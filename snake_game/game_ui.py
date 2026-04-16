@@ -340,6 +340,8 @@ class MainWindow(QMainWindow):
     def _restart(self) -> None:
         self.logic = GameLogic(self.difficulty)
         self.canvas.logic = self.logic
+        self.sidebar.direction_requested.disconnect()
+        self.sidebar.direction_requested.connect(self.logic.set_direction)
         self.sidebar.update_score(0)
         self.sidebar.update_powerups([])
         self.timer.start(self.logic.speed_ms)
