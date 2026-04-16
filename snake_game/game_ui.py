@@ -282,12 +282,85 @@ class Sidebar(QFrame):
             self.leaderboard_content.setText("\n".join(lines))
 
 
+# ── Custom Title Bar ──
+
+class TitleBar(QFrame):
+    """Frameless window title bar with cyberpunk neon styling."""
+
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
+        super().__init__(parent)
+        self.setFixedHeight(32)
+        self.setStyleSheet(f"""
+            QFrame {{
+                background: {COLORS["background"]};
+                border-bottom: 1px solid {COLORS["neon_purple"]};
+            }}
+            QLabel {{
+                color: {COLORS["neon_cyan"]};
+            }}
+        """)
+        self._drag_pos = None
+
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(10, 0, 6, 0)
+        layout.setSpacing(0)
+
+        # Title
+        title = QLabel("Snake Game — Cyberpunk Edition")
+        title.setFont(QFont(_UI_FONT, 10))
+        layout.addWidget(title)
+        layout.addStretch()
+
+        # Minimize button
+        self.btn_min = QPushButton("—")
+        self.btn_min.setFixedSize(36, 28)
+        self.btn_min.setFocusPolicy(Qt.NoFocus)
+        self.btn_min.setStyleSheet(f"""
+            QPushButton {{
+                background: transparent; color: {COLORS["ui_text"]};
+                border: none; font-size: 16px;
+            }}
+            QPushButton:hover {{
+                background: rgba(176, 38, 255, 0.3);
+            }}
+        """)
+        layout.addWidget(self.btn_min)
+
+        # Close button
+        self.btn_close = QPushButton("✕")
+        self.btn_close.setFixedSize(36, 28)
+        self.btn_close.setFocusPolicy(Qt.NoFocus)
+        self.btn_close.setStyleSheet(f"""
+            QPushButton {{
+                background: transparent; color: {COLORS["neon_magenta"]};
+                border: none; font-size: 14px;
+            }}
+            QPushButton:hover {{
+                background: rgba(255, 0, 255, 0.3);
+            }}
+        """)
+        layout.addWidget(self.btn_close)
+
+    # ── Drag to move ──
+    def mousePressEvent(self, event) -> None:  # noqa: N802
+        if event.button() == Qt.LeftButton:
+            self._drag_pos = event.globalPos() - self.window().pos()
+
+    def mouseMoveEvent(self, event) -> None:  # noqa: N802
+        if self._drag_pos is not None:
+            self.window().move(event.globalPos() - self._drag_pos)
+
+    def mouseReleaseEvent(self, event) -> None:  # noqa: N802
+        self._drag_pos = None
+
+
 # ── Main Window ──
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Snake Game \u2014 Cyberpunk Edition")
+        self.setWindowFlags(Qt.FramelessWindowHint)
         self.setStyleSheet(f"background: {COLORS['background']};")
 
         self.difficulty = DifficultyLevel.NORMAL
@@ -302,20 +375,34 @@ class MainWindow(QMainWindow):
     def _build_ui(self) -> None:
         central = QWidget()
         self.setCentralWidget(central)
-        layout = QHBoxLayout(central)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        main_layout = QVBoxLayout(central)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        # Custom title bar
+        self.title_bar = TitleBar(self)
+        self.title_bar.btn_min.clicked.connect(self.showMinimized)
+        self.title_bar.btn_close.clicked.connect(self.close)
+        main_layout.addWidget(self.title_bar)
+
+        # Game area: canvas + sidebar
+        game_row = QWidget()
+        game_layout = QHBoxLayout(game_row)
+        game_layout.setContentsMargins(0, 0, 0, 0)
+        game_layout.setSpacing(0)
 
         # Canvas
         self.canvas = GameCanvas(self.logic)
-        layout.addWidget(self.canvas)
+        game_layout.addWidget(self.canvas)
 
         # Sidebar
         self.sidebar = Sidebar()
         self.sidebar.direction_requested.connect(self.logic.set_direction)
         self.sidebar.update_difficulty(self.difficulty.name)
         self.sidebar.update_leaderboard(self.leaderboard.top_scores())
-        layout.addWidget(self.sidebar)
+        game_layout.addWidget(self.sidebar)
+
+        main_layout.addWidget(game_row)
 
     def _setup_timer(self) -> None:
         self.timer = QTimer(self)
