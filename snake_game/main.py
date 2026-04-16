@@ -1,5 +1,8 @@
 # snake_game/main.py
+import os
 import sys
+
+os.environ["QT_LOGGING_RULES"] = "*.debug=false;qt.qpa.*=false"
 
 from PyQt5.QtWidgets import QApplication
 
