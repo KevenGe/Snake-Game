@@ -120,7 +120,7 @@ class GameCanvas(QWidget):
                           CELL_SIZE * 0.6, CELL_SIZE * 0.6)
             # Icon
             p.setPen(QPen(color))
-            p.setFont(QFont(_SYMBOL_FONT, int(CELL_SIZE * 0.6)))
+            p.setFont(QFont(_SYMBOL_FONT, int(CELL_SIZE * 0.9)))
             p.drawText(QRectF(px, py, CELL_SIZE, CELL_SIZE), Qt.AlignCenter,
                        icon_map.get(ptype, "?"))
 
@@ -161,13 +161,13 @@ class GameCanvas(QWidget):
             return
         p.fillRect(self.rect(), QColor(0, 0, 0, 150))
         p.setPen(QPen(QColor(COLORS["neon_magenta"])))
-        p.setFont(QFont(_UI_FONT, 36, QFont.Bold))
+        p.setFont(QFont(_UI_FONT, 72, QFont.Bold))
         p.drawText(self.rect(), Qt.AlignCenter, "GAME OVER")
         # Draw restart hint below
         hint_rect = QRectF(self.rect())
-        hint_rect.setTop(hint_rect.center().y() + 30)
+        hint_rect.setTop(hint_rect.center().y() + 55)
         p.setPen(QPen(QColor(COLORS["neon_cyan"])))
-        p.setFont(QFont(_UI_FONT, 14))
+        p.setFont(QFont(_UI_FONT, 27))
         p.drawText(hint_rect, Qt.AlignHCenter | Qt.AlignTop, "Press R to Restart")
 
 
@@ -180,7 +180,7 @@ class Sidebar(QFrame):
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
-        self.setFixedWidth(200)
+        self.setFixedWidth(260)
         self.setStyleSheet(f"""
             QFrame {{
                 background: {COLORS["ui_bg"]};
@@ -188,15 +188,15 @@ class Sidebar(QFrame):
             }}
             QLabel {{
                 color: {COLORS["ui_text"]};
-                font-size: 14px;
+                font-size: 24px;
             }}
             QPushButton {{
                 background: transparent;
                 border: 2px solid {COLORS["neon_cyan"]};
                 color: {COLORS["neon_cyan"]};
                 border-radius: 6px;
-                padding: 10px;
-                font-size: 18px;
+                padding: 14px;
+                font-size: 33px;
             }}
             QPushButton:pressed {{
                 background: rgba(0, 255, 204, 0.3);
@@ -211,7 +211,7 @@ class Sidebar(QFrame):
 
         # Score
         self.score_label = QLabel("Score: 0")
-        self.score_label.setFont(QFont(_UI_FONT, 20, QFont.Bold))
+        self.score_label.setFont(QFont(_UI_FONT, 39, QFont.Bold))
         self.score_label.setStyleSheet(f"color: {COLORS['neon_cyan']};")
         layout.addWidget(self.score_label)
 
@@ -253,7 +253,7 @@ class Sidebar(QFrame):
 
         # Leaderboard
         self.leaderboard_label = QLabel("Leaderboard")
-        self.leaderboard_label.setFont(QFont(_UI_FONT, 12, QFont.Bold))
+        self.leaderboard_label.setFont(QFont(_UI_FONT, 24, QFont.Bold))
         layout.addWidget(self.leaderboard_label)
         self.leaderboard_content = QLabel("No scores yet")
         self.leaderboard_content.setWordWrap(True)
@@ -289,7 +289,7 @@ class TitleBar(QFrame):
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
-        self.setFixedHeight(32)
+        self.setFixedHeight(38)
         self.setStyleSheet(f"""
             QFrame {{
                 background: {COLORS["background"]};
@@ -307,18 +307,18 @@ class TitleBar(QFrame):
 
         # Title
         title = QLabel("Snake Game — Cyberpunk Edition")
-        title.setFont(QFont(_UI_FONT, 10))
+        title.setFont(QFont(_UI_FONT, 18))
         layout.addWidget(title)
         layout.addStretch()
 
         # Minimize button
         self.btn_min = QPushButton("—")
-        self.btn_min.setFixedSize(36, 28)
+        self.btn_min.setFixedSize(48, 36)
         self.btn_min.setFocusPolicy(Qt.NoFocus)
         self.btn_min.setStyleSheet(f"""
             QPushButton {{
                 background: transparent; color: {COLORS["ui_text"]};
-                border: none; font-size: 16px;
+                border: none; font-size: 24px;
             }}
             QPushButton:hover {{
                 background: rgba(176, 38, 255, 0.3);
@@ -328,12 +328,12 @@ class TitleBar(QFrame):
 
         # Close button
         self.btn_close = QPushButton("✕")
-        self.btn_close.setFixedSize(36, 28)
+        self.btn_close.setFixedSize(48, 36)
         self.btn_close.setFocusPolicy(Qt.NoFocus)
         self.btn_close.setStyleSheet(f"""
             QPushButton {{
                 background: transparent; color: {COLORS["neon_magenta"]};
-                border: none; font-size: 14px;
+                border: none; font-size: 20px;
             }}
             QPushButton:hover {{
                 background: rgba(255, 0, 255, 0.3);

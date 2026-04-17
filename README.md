@@ -6,6 +6,8 @@
 ![PyQt5](https://img.shields.io/badge/PyQt5-5.15+-41CD52?logo=qt&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
+![alt text](image.png)
+
 ## 功能特性
 
 - **5 个难度级别** — 训练、新手、普通、困难、疯狂（不同速度、初始长度和障碍物复杂度）

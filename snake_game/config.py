@@ -5,7 +5,7 @@ from typing import Dict, Any
 # ── Grid ──
 GRID_COLS = 25
 GRID_ROWS = 20
-CELL_SIZE = 25
+CELL_SIZE = 40
 
 
 # ── Colors ──
